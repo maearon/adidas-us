@@ -44,16 +44,20 @@ function cleanSvg(svg, width, height, scale) {
   };
 }
 
-function toComponent(name, label, { width, height, d }) {
+function toComponent(name, { width, height, d }, options = {}) {
   const exportName = `${name[0].toUpperCase()}${name.slice(1)}Icon`;
+  const sizeClass = options.sizeClass ?? "h-[22px] w-auto";
+  const ariaHidden = options.ariaHidden ?? true;
+  const ariaLabel = options.ariaLabel;
+
   return `export function ${exportName}({ className }: IconProps) {
   return (
     <svg
       xmlns="http://www.w3.org/2000/svg"
       viewBox="0 0 ${width} ${height}"
       fill="none"
-      className={cn("h-[22px] w-auto", className)}
-      aria-hidden
+      className={cn("${sizeClass}", className)}
+      ${ariaHidden ? "aria-hidden" : `role="img" aria-label="${ariaLabel}"`}
     >
       <path d="${d}" fill="currentColor" fillRule="evenodd" />
     </svg>
@@ -61,12 +65,11 @@ function toComponent(name, label, { width, height, d }) {
 }`;
 }
 
-async function bmpToSvg(name) {
+async function bmpToSvg(name, scale = 4) {
   const src = `scripts/tmp-${name}.png`;
   const meta = await sharp(src).metadata();
   const width = meta.width ?? 24;
   const height = meta.height ?? 24;
-  const scale = 4;
 
   await sharp(src)
     .resize(width * scale, height * scale, { kernel: sharp.kernel.nearest })
@@ -102,9 +105,16 @@ async function bmpToSvg(name) {
   return icon;
 }
 
+const iconDefs = [
+  { name: "logo", scale: 4, options: { sizeClass: "h-8 w-auto", ariaHidden: false, ariaLabel: "adidas" } },
+  { name: "wish", scale: 4 },
+  { name: "bag", scale: 4 },
+  { name: "chatbot", scale: 4 },
+];
+
 const icons = [];
-for (const name of ["wish", "bag", "chatbot"]) {
-  icons.push({ name, data: await bmpToSvg(name) });
+for (const def of iconDefs) {
+  icons.push({ name: def.name, data: await bmpToSvg(def.name, def.scale), options: def.options ?? {} });
 }
 
 const componentFile = `import { cn } from "@/lib/cn";
@@ -113,7 +123,7 @@ type IconProps = {
   className?: string;
 };
 
-${icons.map(({ name, data }) => toComponent(name, name, data)).join("\n\n")}
+${icons.map(({ name, data, options }) => toComponent(name, data, options)).join("\n\n")}
 `;
 
 fs.writeFileSync("src/components/icons/HeaderIcons.tsx", componentFile);

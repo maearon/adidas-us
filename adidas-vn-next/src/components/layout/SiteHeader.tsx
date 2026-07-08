@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { useState } from "react";
-import { WishIcon, BagIcon } from "@/components/icons/HeaderIcons";
+import { LogoIcon, WishIcon, BagIcon } from "@/components/icons/HeaderIcons";
 import { MAIN_NAV, SALE_LINK } from "@/lib/navigation";
 import { cn } from "@/lib/cn";
 
@@ -43,8 +43,7 @@ export function SiteHeaderClient({ session, wishlistCount }: Props) {
       {/* Main nav */}
       <div className="mx-auto flex max-w-7xl items-center gap-4 px-4 py-3">
         <Link href="/" className="shrink-0">
-          {/* eslint-disable-next-line @next/next/no-img-element */}
-          <img src="/img/logo.svg" alt="adidas" className="h-8 w-auto brightness-0 invert" />
+          <LogoIcon className="text-white" />
         </Link>
 
         <nav className="hidden flex-1 items-center gap-6 lg:flex">
