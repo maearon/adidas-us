@@ -3,6 +3,7 @@ import path from "path";
 import Link from "next/link";
 import { getSession } from "@/lib/session";
 import { prisma } from "@/lib/prisma";
+import { sanitizeLegacyMenuHtml } from "@/lib/legacy-menu";
 
 function readLegacyFragment(file: string) {
   const fullPath = path.join(process.cwd(), "public", "vn", "include", file);
@@ -16,19 +17,21 @@ export async function LegacyMenu() {
     wishlistCount = await prisma.wishlistItem.count({ where: { userEmail: session.email } });
   }
 
-  let menuHtml = readLegacyFragment("menu-legacy.html");
   const cartHref = session ? "/vn/cart" : "/vn/login";
   const wishHref = session ? "/vn/wishlist" : "/vn/login";
-  menuHtml = menuHtml
-    .replace(/href="\/vn\/cart"/g, `href="${cartHref}"`)
-    .replace(/href="\/vn\/wishlist"/g, `href="${wishHref}"`)
-    .replace(/href="\/vn\/login\/"/g, 'href="/vn/login"');
+
+  const menuHtml = sanitizeLegacyMenuHtml(readLegacyFragment("menu-legacy.html"), {
+    cartHref,
+    wishHref,
+    wishlistCount,
+    loggedIn: Boolean(session),
+  });
 
   return (
     <div id="topdiv">
       <div dangerouslySetInnerHTML={{ __html: readLegacyFragment("slidenav.html") }} />
       {!session ? (
-        <div className="glass-header-top">
+        <div className="glass-header-top glass-header-top--single">
           <Link href="#">Giúp</Link>
           <div className="menu-spacer___3Gp4L" />
           <Link href="#">theo dõi đơn hàng và trả về</Link>
@@ -37,7 +40,7 @@ export async function LegacyMenu() {
           <Link href="/vn/login">Đăng nhập <span className="login-icon" /></Link>
         </div>
       ) : (
-        <div className="glass-header-top">
+        <div className="glass-header-top glass-header-top--single">
           <Link href="/vn/login/profile">tài khoản của tôi</Link>
           <div className="menu-spacer___3Gp4L" />
           <Link href="/vn/wishlist">danh sách yêu thích</Link>
@@ -52,9 +55,6 @@ export async function LegacyMenu() {
         </div>
       )}
       <div dangerouslySetInnerHTML={{ __html: menuHtml }} />
-      {session && wishlistCount > 0 && (
-        <style>{`.wish .centered::after { content: "${wishlistCount}"; }`}</style>
-      )}
     </div>
   );
 }

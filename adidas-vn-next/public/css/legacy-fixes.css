@@ -1,0 +1,83 @@
+/* Patches for legacy 2018 PHP UI when ported to Next.js */
+
+/* Only one utility header bar — prevent duplicate overlap from old HTML */
+.glass-header-top--single {
+  position: relative;
+  z-index: 2004;
+}
+
+#topdiv .glass-header-top:not(.glass-header-top--single) {
+  display: none !important;
+}
+
+/* Utility bar: wrap on laptop instead of overlapping */
+.glass-header-top {
+  position: relative !important;
+  max-width: 100% !important;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+  height: auto !important;
+  min-height: 32px;
+  padding: 4px 12px;
+  box-sizing: border-box;
+  gap: 2px;
+  background: #000;
+}
+
+.glass-header-top a {
+  white-space: nowrap;
+  font-size: 10px !important;
+  padding: 4px 8px !important;
+  line-height: 1.2;
+}
+
+@media (max-width: 1100px) {
+  .glass-header-top a:not(em a) {
+    padding: 4px 5px !important;
+    font-size: 9px !important;
+  }
+}
+
+/* Logo + bag/wish clickable above fixed menu */
+#logo {
+  position: relative;
+  z-index: 2005;
+}
+
+#logo a {
+  display: block;
+  width: 90px;
+  height: 55px;
+}
+
+.menu a.addtobag {
+  position: relative;
+  z-index: 2005;
+  pointer-events: auto;
+}
+
+.menu .wish a.addtobag {
+  pointer-events: auto;
+}
+
+/* Spacer under fixed header */
+#topdivvv {
+  height: 118px;
+}
+
+@media (max-width: 1100px) {
+  #topdivvv {
+    height: 132px;
+  }
+}
+
+/* Product zoom panel */
+.img-zoom-result.is-active {
+  display: block !important;
+  opacity: 1;
+  visibility: visible;
+}
+
+.images_container___3KxTB {
+  cursor: zoom-in;
+}

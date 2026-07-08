@@ -29,6 +29,7 @@ const LEGACY_CSS = [
   "/css/search/search.css",
   "/css/register/register.css",
   "/css/build-COMMON/profile.css",
+  "/css/legacy-fixes.css",
 ];
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {

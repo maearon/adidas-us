@@ -1,18 +1,17 @@
 import { notFound } from "next/navigation";
-import Link from "next/link";
 import Script from "next/script";
 import { prisma } from "@/lib/prisma";
 import { getSession } from "@/lib/session";
-import { formatVnd, productDetailImageUrl, productGenderLabel, productImageUrl } from "@/lib/format";
+import { formatVnd, productGenderLabel } from "@/lib/format";
 import { AddToCartButton, WishlistButton, CommentForm } from "@/components/CommerceButtons";
 import { LegacyProductCardClient } from "@/components/legacy/LegacyProductCardClient";
-import { ProductThumbnails } from "@/components/legacy/ProductThumbnails";
+import { ProductImageViewer } from "@/components/legacy/ProductImageViewer";
 
-type Props = { searchParams: Promise<{ slot?: string }> };
+type Props = { searchParams: Promise<{ slot?: string; id?: string }> };
 
 export default async function ProductPage({ searchParams }: Props) {
-  const { slot } = await searchParams;
-  const id = Number(slot);
+  const params = await searchParams;
+  const id = Number(params.slot ?? params.id);
   if (!id) notFound();
 
   const product = await prisma.product.findUnique({
@@ -45,21 +44,8 @@ export default async function ProductPage({ searchParams }: Props) {
 
   return (
     <>
-      <link rel="stylesheet" href="/css/product/product.css" />
       <Script src="/js/zoom.js" strategy="afterInteractive" />
-
-      <div data-auto-id="glass-image-viewer" className="glass_image_viewer___3pD5T" style={{ backgroundColor: "#eceef0", backgroundSize: "50% 100%!important" }}>
-        <div data-auto-id="images_container" className="images_container___3KxTB" style={{ marginLeft: -250 }}>
-          {/* eslint-disable-next-line @next/next/no-img-element */}
-          <img
-            id="expandedImg"
-            className="performance-item"
-            alt={product.name}
-            src={productDetailImageUrl(product.id, 1)}
-          />
-          <div id="myresult" className="img-zoom-result" style={{ display: "none" }} />
-        </div>
-      </div>
+      <ProductImageViewer productId={product.id} productName={product.name} />
 
       <main style={{ marginLeft: 320, padding: "20px 10px" }}>
         <h1>{product.name}</h1>
@@ -76,8 +62,6 @@ export default async function ProductPage({ searchParams }: Props) {
           <AddToCartButton productId={product.id} />
           {session && <WishlistButton productId={product.id} inWishlist={inWishlist} />}
         </div>
-
-        <ProductThumbnails productId={product.id} />
 
         <section style={{ marginTop: 32 }}>
           <h2>Bình luận ({product.comments.length})</h2>
