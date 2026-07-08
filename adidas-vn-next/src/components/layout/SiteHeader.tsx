@@ -1,8 +1,8 @@
 "use client";
 
-import Image from "next/image";
 import Link from "next/link";
 import { useState } from "react";
+import { WishIcon, BagIcon } from "@/components/icons/HeaderIcons";
 import { MAIN_NAV, SALE_LINK } from "@/lib/navigation";
 import { cn } from "@/lib/cn";
 
@@ -43,7 +43,8 @@ export function SiteHeaderClient({ session, wishlistCount }: Props) {
       {/* Main nav */}
       <div className="mx-auto flex max-w-7xl items-center gap-4 px-4 py-3">
         <Link href="/" className="shrink-0">
-          <Image src="/img/logo.svg" alt="adidas" width={56} height={36} className="h-8 w-auto invert" priority />
+          {/* eslint-disable-next-line @next/next/no-img-element */}
+          <img src="/img/logo.svg" alt="adidas" className="h-8 w-auto brightness-0 invert" />
         </Link>
 
         <nav className="hidden flex-1 items-center gap-6 lg:flex">
@@ -96,7 +97,7 @@ export function SiteHeaderClient({ session, wishlistCount }: Props) {
 
         <div className="ml-auto flex items-center gap-3">
           <Link href={wishHref} className="relative p-1 hover:opacity-80" aria-label="Yêu thích">
-            <Image src="/img/wish.png" alt="" width={22} height={22} className="invert" />
+            <WishIcon className="text-white" />
             {wishlistCount > 0 && (
               <span className="absolute -right-1 -top-1 flex h-4 w-4 items-center justify-center rounded-full bg-white text-[10px] font-bold text-black">
                 {wishlistCount}
@@ -104,7 +105,7 @@ export function SiteHeaderClient({ session, wishlistCount }: Props) {
             )}
           </Link>
           <Link href={cartHref} className="p-1 hover:opacity-80" aria-label="Giỏ hàng">
-            <Image src="/img/bag.png" alt="" width={22} height={22} className="invert" />
+            <BagIcon className="text-white" />
           </Link>
           <button
             type="button"
