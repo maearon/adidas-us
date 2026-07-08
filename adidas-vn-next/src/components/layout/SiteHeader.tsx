@@ -43,7 +43,7 @@ export function SiteHeaderClient({ session, wishlistCount }: Props) {
       {/* Main nav */}
       <div className="mx-auto flex max-w-7xl items-center gap-4 px-4 py-3">
         <Link href="/" className="shrink-0">
-          <Image src="/img/logo.png" alt="adidas" width={56} height={36} className="h-8 w-auto invert" priority />
+          <Image src="/img/logo.svg" alt="adidas" width={56} height={36} className="h-8 w-auto invert" priority />
         </Link>
 
         <nav className="hidden flex-1 items-center gap-6 lg:flex">
