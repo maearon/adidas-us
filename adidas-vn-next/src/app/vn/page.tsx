@@ -1,6 +1,6 @@
 import { prisma } from "@/lib/prisma";
 import { buildProductWhere, parseFilterTokens } from "@/lib/filters";
-import { LegacyProductCardClient } from "@/components/legacy/LegacyProductCardClient";
+import { ProductCard } from "@/components/commerce/ProductCard";
 
 type Props = { searchParams: Promise<Record<string, string | string[] | undefined>> };
 
@@ -11,27 +11,26 @@ export default async function CatalogPage({ searchParams }: Props) {
     ? parseFilterTokens(rawKey)
     : parseFilterTokens(Object.entries(params).map(([k, v]) => `${k}=${v}`).join("&"));
   const where = buildProductWhere(tokens);
-
-  const products = await prisma.product.findMany({
-    where,
-    orderBy: { id: "asc" },
-  });
-
   const title = tokens.length ? tokens.join(" / ").toUpperCase() : "TẤT CẢ SẢN PHẨM";
 
+  const products = await prisma.product.findMany({ where, orderBy: { id: "asc" } });
+
   return (
-    <main>
-      <h1 style={{ marginLeft: 320, marginTop: 20 }}>{title}</h1>
-      <p style={{ marginLeft: 320, marginBottom: 20 }}>{products.length} sản phẩm</p>
-      {products.length === 0 ? (
-        <p style={{ marginLeft: 320 }}>Không tìm thấy sản phẩm phù hợp.</p>
-      ) : (
-        products.map((p) => <LegacyProductCardClient key={p.id} product={p} />)
-      )}
-      <div className="pagination">
-        <div style={{ float: "left", marginLeft: 0 }}>Sắp xếp theo: Tên sản phẩm [A-Z]</div>
-        <div style={{ float: "left", marginLeft: 140 }}>Xem: {products.length}</div>
+    <div className="mx-auto max-w-7xl px-4 py-8">
+      <div className="mb-8 border-b border-neutral-200 pb-4">
+        <h1 className="text-2xl font-bold uppercase tracking-wide">{title}</h1>
+        <p className="mt-1 text-sm text-neutral-600">{products.length} sản phẩm</p>
       </div>
-    </main>
+
+      {products.length === 0 ? (
+        <p className="text-neutral-500">Không tìm thấy sản phẩm phù hợp.</p>
+      ) : (
+        <div className="grid grid-cols-2 gap-4 md:grid-cols-3 lg:grid-cols-4 md:gap-6">
+          {products.map((p) => (
+            <ProductCard key={p.id} product={p} />
+          ))}
+        </div>
+      )}
+    </div>
   );
 }

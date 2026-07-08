@@ -2,8 +2,8 @@ import Link from "next/link";
 import { redirect } from "next/navigation";
 import { prisma } from "@/lib/prisma";
 import { getSession } from "@/lib/session";
-import { formatVnd, productImageUrl } from "@/lib/format";
-import { LegacyProductCardClient } from "@/components/legacy/LegacyProductCardClient";
+import { ProductCard } from "@/components/commerce/ProductCard";
+import { buttonClass } from "@/components/ui/Button";
 
 export default async function WishlistPage() {
   const session = await getSession();
@@ -15,13 +15,23 @@ export default async function WishlistPage() {
   });
 
   return (
-    <main>
-      <h1 style={{ marginLeft: 320, marginTop: 20 }}>Danh sách yêu thích</h1>
+    <div className="mx-auto max-w-7xl px-4 py-10">
+      <h1 className="text-2xl font-bold uppercase">Danh sách yêu thích</h1>
+
       {items.length === 0 ? (
-        <p style={{ marginLeft: 320 }}>Chưa có sản phẩm. <Link href="/vn">Khám phá</Link></p>
+        <div className="mt-12 text-center">
+          <p className="text-neutral-600">Chưa có sản phẩm yêu thích.</p>
+          <Link href="/vn" className={buttonClass("primary", "md") + " mt-6 inline-flex"}>
+            Khám phá sản phẩm
+          </Link>
+        </div>
       ) : (
-        items.map((item) => <LegacyProductCardClient key={item.id} product={item.product} />)
+        <div className="mt-8 grid grid-cols-2 gap-4 md:grid-cols-3 lg:grid-cols-4 md:gap-6">
+          {items.map((item) => (
+            <ProductCard key={item.id} product={item.product} />
+          ))}
+        </div>
       )}
-    </main>
+    </div>
   );
 }

@@ -1,28 +1,29 @@
 "use client";
 
 import { useRouter } from "next/navigation";
+import { Button } from "@/components/ui/Button";
+import { cn } from "@/lib/cn";
+
+const inputClass = "w-full border border-neutral-300 px-4 py-3 text-sm focus:border-black focus:outline-none";
 
 export function AddToCartButton({ productId }: { productId: number }) {
   const router = useRouter();
 
   async function add() {
-    await fetch("/api/cart", {
+    const res = await fetch("/api/cart", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ productId }),
     });
+    if (res.status === 401) {
+      router.push("/vn/login?redirect=/vn/cart");
+      return;
+    }
     router.push("/vn/cart");
     router.refresh();
   }
 
-  return (
-    <button
-      onClick={add}
-      className="flex-1 bg-black py-3 text-sm font-semibold uppercase text-white hover:bg-neutral-800"
-    >
-      Thêm vào giỏ
-    </button>
-  );
+  return <Button onClick={add} className="flex-1">Thêm vào giỏ</Button>;
 }
 
 export function WishlistButton({ productId, inWishlist }: { productId: number; inWishlist: boolean }) {
@@ -38,12 +39,9 @@ export function WishlistButton({ productId, inWishlist }: { productId: number; i
   }
 
   return (
-    <button
-      onClick={toggle}
-      className="border border-black px-6 py-3 text-sm font-semibold uppercase hover:bg-neutral-100"
-    >
+    <Button variant="secondary" onClick={toggle}>
       {inWishlist ? "♥ Đã thích" : "♡ Yêu thích"}
-    </button>
+    </Button>
   );
 }
 
@@ -60,7 +58,7 @@ export function RemoveCartButton({ itemId }: { itemId: number }) {
   }
 
   return (
-    <button onClick={remove} className="text-sm text-red-600 hover:underline">
+    <button type="button" onClick={remove} className="mt-2 text-sm text-red-600 hover:underline">
       Xóa
     </button>
   );
@@ -71,8 +69,7 @@ export function CommentForm({ productId }: { productId: number }) {
 
   async function submit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();
-    const form = e.currentTarget;
-    const formData = new FormData(form);
+    const formData = new FormData(e.currentTarget);
     await fetch("/api/comments", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
@@ -82,16 +79,18 @@ export function CommentForm({ productId }: { productId: number }) {
         body: formData.get("body"),
       }),
     });
-    form.reset();
+    e.currentTarget.reset();
     router.refresh();
   }
 
   return (
-    <form onSubmit={submit} className="mt-4 space-y-3 border-t pt-4">
+    <form onSubmit={submit} className="mt-6 space-y-4 border-t border-neutral-200 pt-6">
       <h3 className="font-semibold">Viết bình luận</h3>
-      <input name="author" placeholder="Tên của bạn" required className="w-full border px-3 py-2 text-sm" />
-      <textarea name="body" placeholder="Nội dung..." required rows={3} className="w-full border px-3 py-2 text-sm" />
-      <button type="submit" className="bg-black px-4 py-2 text-sm text-white">Gửi</button>
+      <input name="author" placeholder="Tên của bạn" required className={inputClass} />
+      <textarea name="body" placeholder="Nội dung..." required rows={4} className={inputClass} />
+      <Button type="submit" size="sm">Gửi bình luận</Button>
     </form>
   );
 }
+
+export { inputClass };

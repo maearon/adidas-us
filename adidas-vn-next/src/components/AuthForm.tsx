@@ -2,6 +2,8 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
+import { Button } from "@/components/ui/Button";
+import { inputClass } from "@/components/CommerceButtons";
 
 type Field = { name: string; label: string; type?: string; required?: boolean; defaultValue?: string };
 
@@ -9,14 +11,13 @@ type Props = {
   action: string;
   fields: Field[];
   submitLabel: string;
-  error?: string;
   extra?: Record<string, string>;
 };
 
-export function AuthForm({ action, fields, submitLabel, error, extra }: Props) {
+export function AuthForm({ action, fields, submitLabel, extra }: Props) {
   const router = useRouter();
   const [loading, setLoading] = useState(false);
-  const [message, setMessage] = useState(error ?? "");
+  const [message, setMessage] = useState("");
 
   async function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();
@@ -37,7 +38,6 @@ export function AuthForm({ action, fields, submitLabel, error, extra }: Props) {
       setMessage(data.error ?? "Có lỗi xảy ra");
       return;
     }
-
     if (data.message) setMessage(data.message);
     if (data.redirect) {
       router.push(data.redirect);
@@ -52,25 +52,21 @@ export function AuthForm({ action, fields, submitLabel, error, extra }: Props) {
           <input key={f.name} type="hidden" name={f.name} defaultValue={f.defaultValue} />
         ) : (
           <div key={f.name}>
-            <label className="mb-1 block text-sm font-medium">{f.label}</label>
+            <label className="mb-1.5 block text-sm font-medium">{f.label}</label>
             <input
               name={f.name}
               type={f.type ?? "text"}
               required={f.required ?? true}
               defaultValue={f.defaultValue}
-              className="w-full border border-neutral-300 px-3 py-2 focus:border-black focus:outline-none"
+              className={inputClass}
             />
           </div>
         ),
       )}
       {message && <p className="break-all text-sm text-neutral-700">{message}</p>}
-      <button
-        type="submit"
-        disabled={loading}
-        className="w-full bg-black py-3 text-sm font-semibold uppercase text-white hover:bg-neutral-800 disabled:opacity-50"
-      >
+      <Button type="submit" disabled={loading} className="w-full">
         {loading ? "Đang xử lý..." : submitLabel}
-      </button>
+      </Button>
     </form>
   );
 }

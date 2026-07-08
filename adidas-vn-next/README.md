@@ -95,16 +95,18 @@ Mở http://localhost:3000
 - Tailwind CSS 4
 - Session JWT (jose) + bcrypt
 
-## Assets (giao diện gốc PHP 2018)
+## UI (Tailwind CSS 4)
 
-Ảnh sản phẩm, banner, CSS và menu được copy từ `htdocs/`:
+Giao diện được **build lại bằng Tailwind**, đối chiếu nội dung từ bản PHP 2018:
 
-- `public/images/` — 931 ảnh SP (`/images/{id}/{file}`)
-- `public/lib/` — banner homepage
-- `public/img/` — logo, icon menu
-- `public/css/`, `public/js/` — stylesheet & script gốc
-- `public/vn/include/menu-legacy.html` — menu mega dropdown
+- Header đen + utility bar + mega menu (Nam/Nữ/Trẻ em/Sale)
+- Homepage hero + teaser (ảnh `/lib/`)
+- Product grid với hover ảnh (`/images/{id}/`)
+- Product detail + lightbox click-to-zoom
+- Footer newsletter
 
-**Quan trọng:** Phải commit thư mục `public/images`, `public/lib`, `public/img` lên Git — nếu không Vercel sẽ không có ảnh.
+**Không còn load** CSS thuần cũ (`/css/menu.css`, v.v.) — giữ `public/images`, `public/lib`, `public/img` cho assets.
+
+Legacy components trong `src/components/legacy/` có thể xóa sau khi xác nhận UI ổn.
 - Checkout chỉ demo UI (giống app PHP cũ không có thanh toán thật)
 - Password đã hash bcrypt (không còn plaintext như PHP cũ)

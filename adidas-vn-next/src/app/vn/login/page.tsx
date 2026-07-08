@@ -12,7 +12,7 @@ export default async function LoginPage({ searchParams }: Props) {
   const { redirect: redirectTo } = await searchParams;
 
   return (
-    <div className="mx-auto max-w-7xl px-4 py-12">
+    <div className="mx-auto max-w-7xl px-4 py-16">
       <h1 className="mb-8 text-center text-2xl font-bold uppercase">Đăng nhập</h1>
       <AuthForm
         action="/api/auth/login"
@@ -23,14 +23,12 @@ export default async function LoginPage({ searchParams }: Props) {
         ]}
         submitLabel="Đăng nhập"
       />
-      <div className="mt-6 text-center text-sm">
+      <p className="mt-6 text-center text-sm">
         <Link href="/vn/register" className="underline">Chưa có tài khoản? Đăng ký</Link>
         <span className="mx-2">·</span>
         <Link href="/vn/login/forgot" className="underline">Quên mật khẩu?</Link>
-      </div>
-      <p className="mt-8 text-center text-xs text-neutral-500">
-        Demo: demo@adidas.vn / demo123456
       </p>
+      <p className="mt-8 text-center text-xs text-neutral-500">Demo: demo@adidas.vn / demo123456</p>
     </div>
   );
 }
