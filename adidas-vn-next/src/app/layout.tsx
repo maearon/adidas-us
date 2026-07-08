@@ -3,6 +3,7 @@ import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
 import { SiteHeader } from "@/components/layout/SiteHeaderWrapper";
 import { SiteFooter } from "@/components/layout/SiteFooter";
+import { ChatbotFab } from "@/components/layout/ChatbotFab";
 
 export const dynamic = "force-dynamic";
 
@@ -24,6 +25,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         <SiteHeader />
         <main className="flex-1">{children}</main>
         <SiteFooter />
+        <ChatbotFab />
       </body>
     </html>
   );
