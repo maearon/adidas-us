@@ -28,7 +28,19 @@ Rewrite của dự án PHP/MySQL 2018 (`htdocs`) lên **Next.js 16**, **Prisma 7
 
 ## Deploy Vercel + Neon
 
-### 1. Tạo Neon database
+### Vercel project settings
+
+Nếu repo là monorepo (`adidas-us`), đặt **Root Directory** = `adidas-vn-next`.
+
+### Environment Variables (bắt buộc cho runtime)
+
+| Biến | Khi nào cần |
+|---|---|
+| `DATABASE_URL` | Runtime — Neon connection string |
+| `SESSION_SECRET` | Runtime — chuỗi random 32+ ký tự |
+| `NEXT_PUBLIC_APP_URL` | Runtime — `https://your-app.vercel.app` |
+
+> `DATABASE_URL` **không** bắt buộc lúc `prisma generate` (build). Nhưng **phải có** trên Vercel để app chạy được sau khi deploy.
 
 1. Vào [neon.tech](https://neon.tech) → tạo project PostgreSQL
 2. Copy connection string
