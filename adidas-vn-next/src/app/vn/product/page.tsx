@@ -1,10 +1,12 @@
 import { notFound } from "next/navigation";
-import Image from "next/image";
+import Link from "next/link";
+import Script from "next/script";
 import { prisma } from "@/lib/prisma";
 import { getSession } from "@/lib/session";
-import { formatVnd, productImageUrl } from "@/lib/format";
+import { formatVnd, productDetailImageUrl, productGenderLabel, productImageUrl } from "@/lib/format";
 import { AddToCartButton, WishlistButton, CommentForm } from "@/components/CommerceButtons";
-import { ProductCard } from "@/components/ProductCard";
+import { LegacyProductCardClient } from "@/components/legacy/LegacyProductCardClient";
+import { ProductThumbnails } from "@/components/legacy/ProductThumbnails";
 
 type Props = { searchParams: Promise<{ slot?: string }> };
 
@@ -22,19 +24,18 @@ export default async function ProductPage({ searchParams }: Props) {
   const session = await getSession();
   let inWishlist = false;
   if (session?.email) {
-    const w = await prisma.wishlistItem.findFirst({
+    inWishlist = !!(await prisma.wishlistItem.findFirst({
       where: { productId: id, userEmail: session.email },
-    });
-    inWishlist = !!w;
+    }));
   }
 
   const related = await prisma.product.findMany({
     where: {
       id: { not: id },
       OR: [
-        { franchise: product.franchise || undefined },
-        { sports: product.sports || undefined },
-        { gender: product.gender || undefined },
+        product.franchise ? { franchise: product.franchise } : {},
+        product.sports ? { sports: product.sports } : {},
+        product.gender ? { gender: product.gender } : {},
       ],
     },
     take: 4,
@@ -43,61 +44,62 @@ export default async function ProductPage({ searchParams }: Props) {
   const hasSale = product.onSale === "sale" || (product.originalPriceUsd && product.originalPriceUsd > product.priceUsd);
 
   return (
-    <div className="mx-auto max-w-7xl px-4 py-8">
-      <div className="grid gap-8 md:grid-cols-2">
-        <div className="relative aspect-square bg-neutral-100">
-          <Image src={productImageUrl(product.id, "detail")} alt={product.name} fill className="object-cover" priority />
-        </div>
-        <div>
-          <p className="text-xs uppercase text-neutral-500">{product.gender} · {product.sports || product.category}</p>
-          <h1 className="mt-2 text-2xl font-bold uppercase">{product.name}</h1>
-          {product.color && <p className="mt-1 text-sm">{product.color} — {product.colorDetail}</p>}
-          <div className="mt-4 flex items-baseline gap-3">
-            <span className="text-xl font-bold">{formatVnd(product.priceUsd)}</span>
-            {product.originalPriceUsd && product.originalPriceUsd > 0 && (
-              <span className="text-neutral-400 line-through">{formatVnd(product.originalPriceUsd)}</span>
-            )}
-            {hasSale && <span className="bg-red-600 px-2 py-0.5 text-xs font-bold text-white">SALE</span>}
-          </div>
-          <div className="mt-6 flex gap-3">
-            <AddToCartButton productId={product.id} />
-            {session && <WishlistButton productId={product.id} inWishlist={inWishlist} />}
-          </div>
-          {!session && (
-            <p className="mt-4 text-sm text-neutral-500">
-              <a href="/vn/login" className="underline">Đăng nhập</a> để thêm vào danh sách yêu thích.
-            </p>
-          )}
-          <dl className="mt-8 space-y-2 text-sm">
-            {product.franchise && <div><dt className="inline font-semibold">Franchise: </dt><dd className="inline">{product.franchise}</dd></div>}
-            {product.brand && <div><dt className="inline font-semibold">Brand: </dt><dd className="inline">{product.brand}</dd></div>}
-            {product.productType && <div><dt className="inline font-semibold">Loại: </dt><dd className="inline">{product.productType}</dd></div>}
-          </dl>
+    <>
+      <link rel="stylesheet" href="/css/product/product.css" />
+      <Script src="/js/zoom.js" strategy="afterInteractive" />
+
+      <div data-auto-id="glass-image-viewer" className="glass_image_viewer___3pD5T" style={{ backgroundColor: "#eceef0", backgroundSize: "50% 100%!important" }}>
+        <div data-auto-id="images_container" className="images_container___3KxTB" style={{ marginLeft: -250 }}>
+          {/* eslint-disable-next-line @next/next/no-img-element */}
+          <img
+            id="expandedImg"
+            className="performance-item"
+            alt={product.name}
+            src={productDetailImageUrl(product.id, 1)}
+          />
+          <div id="myresult" className="img-zoom-result" style={{ display: "none" }} />
         </div>
       </div>
 
-      <section className="mt-16">
-        <h2 className="mb-4 text-lg font-bold">Bình luận ({product.comments.length})</h2>
-        {product.comments.map((c) => (
-          <div key={c.id} className="mb-4 border-b pb-4">
-            <p className="font-semibold">{c.author}</p>
-            <p className="text-xs text-neutral-500">{c.date.toLocaleDateString("vi-VN")}</p>
-            <p className="mt-1 text-sm">{c.body}</p>
-          </div>
-        ))}
-        <CommentForm productId={product.id} />
-      </section>
+      <main style={{ marginLeft: 320, padding: "20px 10px" }}>
+        <h1>{product.name}</h1>
+        {product.color && <p>{product.color} — {product.colorDetail}</p>}
+        <p>{productGenderLabel(product)}</p>
+        <h3>
+          <span id="red" style={hasSale ? { color: "red" } : undefined}>{formatVnd(product.priceUsd)}</span>
+          {product.originalPriceUsd && product.originalPriceUsd > 0 ? (
+            <s>{formatVnd(product.originalPriceUsd)}</s>
+          ) : null}
+        </h3>
 
-      {related.length > 0 && (
-        <section className="mt-16">
-          <h2 className="mb-6 text-lg font-bold uppercase">Có thể bạn thích</h2>
-          <div className="grid grid-cols-2 gap-6 md:grid-cols-4">
-            {related.map((p) => (
-              <ProductCard key={p.id} product={p} />
-            ))}
-          </div>
+        <div style={{ display: "flex", gap: 12, margin: "16px 0" }}>
+          <AddToCartButton productId={product.id} />
+          {session && <WishlistButton productId={product.id} inWishlist={inWishlist} />}
+        </div>
+
+        <ProductThumbnails productId={product.id} />
+
+        <section style={{ marginTop: 32 }}>
+          <h2>Bình luận ({product.comments.length})</h2>
+          {product.comments.map((c) => (
+            <div key={c.id} style={{ borderBottom: "1px solid #ccc", padding: "12px 0" }}>
+              <strong>{c.author}</strong>
+              <div style={{ fontSize: 12, color: "#666" }}>{c.date.toLocaleDateString("vi-VN")}</div>
+              <p>{c.body}</p>
+            </div>
+          ))}
+          <CommentForm productId={product.id} />
         </section>
-      )}
-    </div>
+
+        {related.length > 0 && (
+          <section style={{ marginTop: 40 }}>
+            <h2>Có thể bạn thích</h2>
+            {related.map((p) => (
+              <LegacyProductCardClient key={p.id} product={p} />
+            ))}
+          </section>
+        )}
+      </main>
+    </>
   );
 }

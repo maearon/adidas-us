@@ -95,8 +95,16 @@ Mở http://localhost:3000
 - Tailwind CSS 4
 - Session JWT (jose) + bcrypt
 
-## Lưu ý
+## Assets (giao diện gốc PHP 2018)
 
-- Ảnh sản phẩm dùng placeholder (picsum) vì repo gốc thiếu `/images/`
+Ảnh sản phẩm, banner, CSS và menu được copy từ `htdocs/`:
+
+- `public/images/` — 931 ảnh SP (`/images/{id}/{file}`)
+- `public/lib/` — banner homepage
+- `public/img/` — logo, icon menu
+- `public/css/`, `public/js/` — stylesheet & script gốc
+- `public/vn/include/menu-legacy.html` — menu mega dropdown
+
+**Quan trọng:** Phải commit thư mục `public/images`, `public/lib`, `public/img` lên Git — nếu không Vercel sẽ không có ảnh.
 - Checkout chỉ demo UI (giống app PHP cũ không có thanh toán thật)
 - Password đã hash bcrypt (không còn plaintext như PHP cũ)
