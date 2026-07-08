@@ -1,0 +1,90 @@
+generator client {
+  provider = "prisma-client"
+  output   = "../src/generated/prisma"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+model Product {
+  id               Int      @id
+  name             String
+  releaseDate      DateTime?
+  image            String
+  imageHover       String
+  imageDetail      String
+  gender           String   @default("")
+  age              String   @default("")
+  priceUsd         Int
+  originalPriceUsd Int?
+  onSale           String   @default("")
+  color            String   @default("")
+  colorDetail      String   @default("")
+  franchise        String   @default("")
+  productType      String   @default("")
+  brand            String   @default("")
+  category         String   @default("")
+  sports           String   @default("")
+  miAdidas         String   @default("")
+  teamName         String   @default("")
+  partner          String   @default("")
+  cartItems        CartItem[]
+  wishlistItems    WishlistItem[]
+  comments         Comment[]
+
+  @@map("sanpham")
+}
+
+model User {
+  id           Int      @id @default(autoincrement())
+  email        String   @unique
+  passwordHash String
+  name         String
+  lastname     String
+  resetToken   String?
+  resetExpires BigInt   @default(0)
+  addressName  String   @default("")
+  street       String   @default("")
+  addressType  String   @default("")
+  city         String   @default("")
+  state        String   @default("")
+  zipcode      String   @default("")
+  country      String   @default("")
+  phone        String   @default("")
+  cartItems    CartItem[]
+  wishlistItems WishlistItem[]
+
+  @@map("taikhoan")
+}
+
+model CartItem {
+  id        Int     @id @default(autoincrement())
+  productId Int
+  userEmail String
+  product   Product @relation(fields: [productId], references: [id], onDelete: Cascade)
+  user      User?   @relation(fields: [userEmail], references: [email], onDelete: Cascade)
+
+  @@map("giohang")
+}
+
+model WishlistItem {
+  id        Int     @id @default(autoincrement())
+  productId Int
+  userEmail String
+  product   Product @relation(fields: [productId], references: [id], onDelete: Cascade)
+  user      User?   @relation(fields: [userEmail], references: [email], onDelete: Cascade)
+
+  @@map("yeuthich")
+}
+
+model Comment {
+  id        Int      @id @default(autoincrement())
+  productId Int
+  author    String
+  body      String
+  date      DateTime @db.Date
+  product   Product  @relation(fields: [productId], references: [id], onDelete: Cascade)
+
+  @@map("comments")
+}
